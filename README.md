@@ -1,2 +1,3 @@
-# LLM-Components
-🚀 Welcome to LM-Components-Playground! Uncover the secrets of Language Models step by step. Dive into simplified implementations of self-attention, multi-headed attention, and more. Join us on the journey to understand the building blocks of LLMs. Happy coding! 📚💻 #LMComponents #NLP
+# LLM-Playground-Components
+
+Dive into the intricacies of Language Models with LLM Playground Components. Simplified, step-by-step implementations of fundamental components—self-attention, multi-headed attention, and more. Ideal for learning and experimentation. Note: Unoptimized code for educational purposes.
