@@ -50,14 +50,16 @@ class BaseSelfAttention(nn.Module):
         causal_mask = causal_mask[:,-Sq:,-Sk:] # Trim off, for kv_cache, no-op if kv_cache is None
 
         if mask_value is None:
-            mask_value = -torch.inf
+            mask_value = torch.finfo(attention_logits.dtype).min
 
         # replace upper triangular with -inf or a very large negative number, causal masking!
         masked_attention_logits = attention_logits.masked_fill_(causal_mask == 0, mask_value) 
         return masked_attention_logits
     
-    def apply_attention_mask(self,attention_mask,masked_attention_logits):
-        masked_attention_logits = masked_attention_logits.masked_fill_(attention_mask[:,None,:] == 0, -torch.inf)
+    def apply_attention_mask(self,attention_mask,masked_attention_logits,mask_value=None):
+        if mask_value is None:
+            mask_value = torch.finfo(masked_attention_logits.dtype).min
+        masked_attention_logits = masked_attention_logits.masked_fill_(attention_mask[:,None,:] == 0, mask_value)
         return masked_attention_logits
     
     def calculate_attention_weights(self,masked_attention_logits):
