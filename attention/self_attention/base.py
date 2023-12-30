@@ -16,18 +16,20 @@ class BaseSelfAttention(nn.Module):
         self.value_proj = nn.Linear(self.embed_dim,self.embed_dim)
         self.output_proj = nn.Linear(self.embed_dim,self.embed_dim)
 
-    def construct_query_key_value(self,x,kv_cache):
+    def construct_query_key_value(self,x):
         # Construct Q, K, V
         query = self.query_proj(x)
         key = self.key_proj(x)
         value = self.value_proj(x)
+        return query, key, value
+    
+    def load_kv_cache(self,kv_cache,key,value):
         if kv_cache is not None:
             key = torch.concat([kv_cache.key,
-                    key],dim=1)
+                    key],dim=2) # B,H,S,E. dim becomes 2
             value = torch.concat([kv_cache.value,
-                      value],dim=1)
-
-        return query, key, value
+                      value],dim=2)
+        return key,value
     
     def calculate_unmasked_attention_logits(self,query,key):
         # Q.K' : [B,S,E] @ [B,E,S]
@@ -73,7 +75,10 @@ class BaseSelfAttention(nn.Module):
     
     def forward(self, x,attention_mask=None,kv_cache=None):
         # Construct Q, K, V
-        query, key, value = self.construct_query_key_value(x,kv_cache=kv_cache)
+        query, key, value = self.construct_query_key_value(x)
+
+        # Load kv_cache, no-op if None
+        key, value = self.load_kv_cache(kv_cache,key,value)
 
         # Calculate logits
         unmasked_attention_logits = self.calculate_unmasked_attention_logits(query,key)

@@ -34,28 +34,27 @@ class BaseMultiHeadedAttention(nn.Module):
     def create_heads(self,query,key,value):
         B,S,E = query.shape
         assert E%self.num_heads==0, "embed_dim must be divisible by num_heads"
-        # query = query.view(B,self.num_heads,S,E//self.num_heads)
-        # key = key.view(B,self.num_heads,S,E//self.num_heads)
-        # value = value.view(B,self.num_heads,S,E//self.num_heads)
         query = self._split_head(query,self.num_heads)
         key = self._split_head(key,self.num_heads)
         value = self._split_head(value,self.num_heads)
         return query,key,value
 
-    def construct_query_key_value(self,x,kv_cache):
+    def construct_query_key_value(self,x):
         query = self.query_proj(x)
         key = self.key_proj(x)
         value = self.value_proj(x)
 
         query,key,value = self.create_heads(query,key,value)
-        
+   
+        return query,key,value
+    
+    def load_kv_cache(self,kv_cache,key,value):
         if kv_cache is not None:
             key = torch.concat([kv_cache.key,
                     key],dim=2) # B,H,S,E. dim becomes 2
             value = torch.concat([kv_cache.value,
                       value],dim=2)
-        
-        return query,key,value
+        return key,value
     
     def calculate_unmasked_attention_logits(self,query,key):
         # Q.K' : [B,H,S,E] @ [B,H,E,S]
@@ -109,7 +108,10 @@ class BaseMultiHeadedAttention(nn.Module):
     
     def forward(self, x,attention_mask=None,kv_cache=None):
         # Construct Q, K, V
-        query, key, value = self.construct_query_key_value(x,kv_cache=kv_cache)
+        query, key, value = self.construct_query_key_value(x)
+
+        # Load kv_cache, no-op if None
+        key, value = self.load_kv_cache(kv_cache,key,value)
 
         # Calculate logits
         unmasked_attention_logits = self.calculate_unmasked_attention_logits(query,key)
