@@ -1,5 +1,5 @@
 
-# 🔥 LLM-Playground-Components: Exploring the Cornerstone of LLMs: Attention Mechanisms
+# 🔥 Exploring the Cornerstone of LLMs: Attention Mechanisms
 
 ## Why This Project?
 
