@@ -31,7 +31,7 @@ class BasePreTrainedGroupedQueryAttention(BaseMultiHeadedAttention):
         x = torch.repeat_interleave(x,H//G,dim=1)
         return x
 
-    def construct_query_key_value(self, x):
+    def construct_query_key_value(self, x,kv_cache=None):
         query,key,value =  super().construct_query_key_value(x)
 
         B,H,S,E = key.shape

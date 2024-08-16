@@ -21,7 +21,7 @@ class BaseGroupedQueryAttention(BaseMultiHeadedAttention):
         self.output_proj = nn.Linear(self.embed_dim,self.embed_dim)
 
 
-    def construct_query_key_value(self, x):
+    def construct_query_key_value(self, x,kv_cache=None):
         query = self.query_proj(x)
         key = self.key_proj(x)
         value = self.value_proj(x)
