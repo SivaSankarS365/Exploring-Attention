@@ -10,8 +10,9 @@ Explore the inner workings of Language Models in this educational playground. Th
 - [X] Self-Attention
 - [X] Multi-Head Attention
 - [X] Multi-Query Attention
+- [X] KV-Cache
 - [ ] Rotary Embeddings
-- [ ] KV Cache
+
 
 ### Model Implementation:
 
